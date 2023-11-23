@@ -191,7 +191,7 @@ fun addDataToFirebase(
     val dbCourses: CollectionReference = db.collection("Courses")
 
     //adding our data to our courses object class.
-    val courses = Courses(courseName, courseDescription, courseDuration)
+    val courses = Course(courseName, courseDescription, courseDuration)
 
     //below method is use to add data to Firebase Firestore.
     dbCourses.add(courses).addOnSuccessListener {

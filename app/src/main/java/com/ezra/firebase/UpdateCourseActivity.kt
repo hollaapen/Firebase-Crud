@@ -1,5 +1,6 @@
-package layout
+package com.ezra.firebase
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -22,15 +23,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ezra.firebase.Course
-import com.ezra.firebase.CoursesActivity
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UpdateCourseActivity : ComponentActivity() {
 
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+
             firebaseUI(
                 LocalContext.current,
                 intent.getStringExtra("courseName"),
@@ -38,6 +39,7 @@ class UpdateCourseActivity : ComponentActivity() {
                 intent.getStringExtra("courseDescription"),
                 intent.getStringExtra("courseID")
             )
+
         }
     }
 
@@ -214,8 +216,45 @@ class UpdateCourseActivity : ComponentActivity() {
             }
 
             Spacer(modifier = Modifier.height(10.dp))
+
+            // on below line creating button to delete the course.
+            Button(
+                onClick = {
+                    // on below line calling delete course
+                    // method to delete our course.
+                    deleteDataFromFirebase(courseID, context)
+                },
+                // on below line we are
+                // adding modifier to our button.
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                // on below line we are adding text for our button
+                Text(text = "Delete Course", modifier = Modifier.padding(8.dp))
+            }
         }
     }
+
+    private fun deleteDataFromFirebase(courseID: String?, context: Context) {
+
+        // getting our instance from Firebase Firestore.
+        val db = FirebaseFirestore.getInstance();
+
+        // below line is for getting the collection
+        // where we are storing our courses.
+        db.collection("Courses").document(courseID.toString()).delete().addOnSuccessListener {
+            // displaying toast message when our course is deleted.
+            Toast.makeText(context, "Course Deleted successfully..", Toast.LENGTH_SHORT).show()
+            context.startActivity(Intent(context, CoursesActivity::class.java))
+        }.addOnFailureListener {
+            // on below line displaying toast message when
+            // we are not able to delete the course
+            Toast.makeText(context, "Fail to delete course..", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
 
     private fun updateDataToFirebase(
         courseID: String?,
@@ -235,15 +274,9 @@ class UpdateCourseActivity : ComponentActivity() {
             .addOnSuccessListener {
                 // on below line displaying toast message and opening
                 // new activity to view courses.
-//                Toast.makeText(context, "Course Updated successfully..", Toast.LENGTH_SHORT).show()
-//                context.startActivity(Intent(context, CoursesActivity::class.java))
-//                finish()
-
-                Toast.makeText(
-                    context,
-                    "Data added successfully!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "Course Updated successfully..", Toast.LENGTH_SHORT).show()
+                context.startActivity(Intent(context, CoursesActivity::class.java))
+                finish()
 
             }.addOnFailureListener {
                 Toast.makeText(context, "Fail to update course : " + it.message, Toast.LENGTH_SHORT)
